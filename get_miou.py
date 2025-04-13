@@ -29,13 +29,12 @@ if __name__ == "__main__":
     name_classes    = ["background","aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
     # name_classes    = ["_background_","cat","dog"]
     #-------------------------------------------------------#
-    #   指向VOC数据集所在的文件夹
-    #   默认指向根目录下的VOC数据集
+    #   指向数据集所在的文件夹
     #-------------------------------------------------------#
-    VOCdevkit_path  = 'VOCdevkit'
+    dataset_path  = os.path.join("datasets", 'PlaneEngine')
 
-    image_ids       = open(os.path.join(VOCdevkit_path, "VOC2007/ImageSets/Segmentation/val.txt"),'r').read().splitlines() 
-    gt_dir          = os.path.join(VOCdevkit_path, "VOC2007/SegmentationClass/")
+    image_ids       = open(os.path.join(dataset_path, "val.txt"),'r').read().splitlines() 
+    gt_dir          = os.path.join(dataset_path, "Labels")
     miou_out_path   = "miou_out"
     pred_dir        = os.path.join(miou_out_path, 'detection-results')
 
@@ -49,7 +48,7 @@ if __name__ == "__main__":
 
         print("Get predict result.")
         for image_id in tqdm(image_ids):
-            image_path  = os.path.join(VOCdevkit_path, "VOC2007/JPEGImages/"+image_id+".jpg")
+            image_path  = os.path.join(dataset_path, "Images"+image_id+".jpg")
             image       = Image.open(image_path)
             image       = deeplab.get_miou_png(image)
             image.save(os.path.join(pred_dir, image_id + ".png"))

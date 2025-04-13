@@ -223,9 +223,9 @@ if __name__ == "__main__":
     eval_period         = 5
 
     #------------------------------------------------------------------#
-    #   VOCdevkit_path  数据集路径
+    #   dataset_path  数据集路径
     #------------------------------------------------------------------#
-    VOCdevkit_path  = 'VOCdevkit'
+    dataset_path  = os.path.join("datasets", 'PlaneEngine')
     #------------------------------------------------------------------#
     #   建议选项：
     #   种类少（几类）时，设置为True
@@ -358,9 +358,9 @@ if __name__ == "__main__":
     #---------------------------#
     #   读取数据集对应的txt
     #---------------------------#
-    with open(os.path.join(VOCdevkit_path, "VOC2007/ImageSets/Segmentation/train.txt"),"r") as f:
+    with open(os.path.join(dataset_path, "train.txt"),"r") as f:
         train_lines = f.readlines()
-    with open(os.path.join(VOCdevkit_path, "VOC2007/ImageSets/Segmentation/val.txt"),"r") as f:
+    with open(os.path.join(dataset_path, "val.txt"),"r") as f:
         val_lines = f.readlines()
     num_train   = len(train_lines)
     num_val     = len(val_lines)
@@ -444,8 +444,8 @@ if __name__ == "__main__":
         if epoch_step == 0 or epoch_step_val == 0:
             raise ValueError("数据集过小，无法继续进行训练，请扩充数据集。")
 
-        train_dataset   = DeeplabDataset(train_lines, input_shape, num_classes, True, VOCdevkit_path)
-        val_dataset     = DeeplabDataset(val_lines, input_shape, num_classes, False, VOCdevkit_path)
+        train_dataset   = DeeplabDataset(train_lines, input_shape, num_classes, True, dataset_path)
+        val_dataset     = DeeplabDataset(val_lines, input_shape, num_classes, False, dataset_path)
 
         if distributed:
             train_sampler   = torch.utils.data.distributed.DistributedSampler(train_dataset, shuffle=True,)
@@ -468,7 +468,7 @@ if __name__ == "__main__":
         #   记录eval的map曲线
         #----------------------#
         if local_rank == 0:
-            eval_callback   = EvalCallback(model, input_shape, num_classes, val_lines, VOCdevkit_path, log_dir, Cuda, \
+            eval_callback   = EvalCallback(model, input_shape, num_classes, val_lines, dataset_path, log_dir, Cuda, \
                                             eval_flag=eval_flag, period=eval_period)
         else:
             eval_callback   = None

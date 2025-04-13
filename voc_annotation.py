@@ -14,17 +14,16 @@ from tqdm import tqdm
 trainval_percent    = 1
 train_percent       = 0.9
 #-------------------------------------------------------#
-#   指向VOC数据集所在的文件夹
-#   默认指向根目录下的VOC数据集
+#   指向数据集所在的文件夹
 #-------------------------------------------------------#
-VOCdevkit_path      = 'VOCdevkit'
+dataset_path  = os.path.join("datasets", 'PlaneEngine')
 
 if __name__ == "__main__":
     random.seed(0)
     print("Generate txt in ImageSets.")
-    segfilepath     = os.path.join(VOCdevkit_path, 'VOC2007/SegmentationClass')
-    saveBasePath    = os.path.join(VOCdevkit_path, 'VOC2007/ImageSets/Segmentation')
-    
+    segfilepath     = os.path.join(dataset_path, 'Labels')
+    saveBasePath    = os.path.join(dataset_path)
+
     temp_seg = os.listdir(segfilepath)
     total_seg = []
     for seg in temp_seg:
@@ -64,7 +63,7 @@ if __name__ == "__main__":
 
     print("Check datasets format, this may take a while.")
     print("检查数据集格式是否符合要求，这可能需要一段时间。")
-    classes_nums        = np.zeros([256], np.int)
+    classes_nums        = np.zeros([256], int)
     for i in tqdm(list):
         name            = total_seg[i]
         png_file_name   = os.path.join(segfilepath, name)
