@@ -190,7 +190,7 @@ class EvalCallback():
             plt.xlabel('Epoch')
             plt.ylabel('Miou')
             plt.title('A Miou Curve')
-            plt.legend(loc="upper right")
+            plt.legend(loc="lower right")
 
             plt.savefig(os.path.join(self.log_dir, "epoch_miou.png"))
             plt.cla()
