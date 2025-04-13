@@ -20,8 +20,8 @@ if __name__ == '__main__':
     jpgs_path     = os.path.join(dataset_path, "Images")
     pngs_path     = os.path.join(dataset_path, "Labels")
     
-    classes     = ["_background_","aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
-    # classes     = ["_background_","cat","dog"]
+    # classes     = ["_background_","aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
+    classes     = ["_background_","buckle","tuber"]
     
     count = os.listdir("./datasets/before/") 
     for i in range(0, len(count)):
@@ -39,7 +39,7 @@ if __name__ == '__main__':
                     imageData = base64.b64encode(imageData).decode('utf-8')
 
             img = utils.img_b64_to_arr(imageData)
-            label_name_to_value = {'_background_': 0}
+            label_name_to_value = {"_background_": 0, "buckle": 1, "tuber": 2}
             for shape in data['shapes']:
                 label_name = shape['label']
                 if label_name in label_name_to_value:
