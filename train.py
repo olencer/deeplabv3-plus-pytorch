@@ -234,6 +234,14 @@ if __name__ == "__main__":
     #------------------------------------------------------------------#
     dice_loss       = True
     #------------------------------------------------------------------#
+    #   depth_combine  结合深度信息
+    #------------------------------------------------------------------#
+    depth_combine       = True
+    #------------------------------------------------------------------#
+    #   data_augmentation  结合深度信息
+    #------------------------------------------------------------------#
+    data_augmentation       = True
+    #------------------------------------------------------------------#
     #   是否使用focal loss来防止正负样本不平衡
     #------------------------------------------------------------------#
     focal_loss      = False
@@ -444,8 +452,8 @@ if __name__ == "__main__":
         if epoch_step == 0 or epoch_step_val == 0:
             raise ValueError("数据集过小，无法继续进行训练，请扩充数据集。")
 
-        train_dataset   = DeeplabDataset(train_lines, input_shape, num_classes, True, dataset_path)
-        val_dataset     = DeeplabDataset(val_lines, input_shape, num_classes, False, dataset_path)
+        train_dataset   = DeeplabDataset(train_lines, input_shape, num_classes, True, dataset_path, depth_combine, data_augmentation)
+        val_dataset     = DeeplabDataset(val_lines, input_shape, num_classes, False, dataset_path, depth_combine, data_augmentation)
 
         if distributed:
             train_sampler   = torch.utils.data.distributed.DistributedSampler(train_dataset, shuffle=True,)

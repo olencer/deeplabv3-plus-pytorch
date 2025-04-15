@@ -33,6 +33,10 @@ if __name__ == "__main__":
     count           = False
     # name_classes    = ["background","aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
     name_classes    = ["background", "buckle", "tuber"]
+    #------------------------------------------------------------------#
+    #   depth_combine  结合深度信息
+    #------------------------------------------------------------------#
+    depth_combine       = True
     #----------------------------------------------------------------------------------------------------------#
     #   video_path          用于指定视频的路径，当video_path=0时表示检测摄像头
     #                       想要检测视频，则设置如video_path = "xxx.mp4"即可，代表读取出根目录下的xxx.mp4文件。
@@ -86,13 +90,14 @@ if __name__ == "__main__":
         while True:
             img = input('Input image filename:')
             try:
-                # image = Image.open(img)
-                old_img     = Image.open(img)
-                rgb         = np.array(old_img)
-                depth       = np.array(Image.open(img.replace('Images', 'Depths'))).reshape([1200, 1920, 1])
-                mix         = np.concatenate([rgb, depth], axis=2)
-                image       = Image.fromarray(mix)
-                
+                if depth_combine:
+                    old_img     = Image.open(img)
+                    rgb         = np.array(old_img)
+                    depth       = np.array(Image.open(img.replace('Images', 'Depths'))).reshape([1200, 1920, 1])
+                    mix         = np.concatenate([rgb, depth], axis=2)
+                    image       = Image.fromarray(mix)
+                else:
+                    image = Image.open(img)
             except:
                 print('Open Error! Try again!')
                 continue

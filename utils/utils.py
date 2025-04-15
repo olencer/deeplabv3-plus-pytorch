@@ -18,7 +18,7 @@ def cvtColor(image):
 
     if len(np.shape(image)) == 3 and np.shape(image)[2] == 3:
         return image 
-    else:
+    elif len(np.shape(image)) == 3 and np.shape(image)[2] == 4:
         conv = nn.Sequential(
             # nn.Conv2d(in_channels=4, out_channels=3, kernel_size=1, bias=False),
             nn.Conv2d(in_channels=4, out_channels=3, kernel_size=3, padding=1, bias=False),
@@ -32,6 +32,9 @@ def cvtColor(image):
         image = Image.fromarray((a.detach().numpy().transpose([1, 2, 0]) * 255.0).astype(np.uint8))
 
         return image
+    else:
+        image = image.convert('RGB')
+        return image 
 
 #---------------------------------------------------#
 #   对输入图像进行resize

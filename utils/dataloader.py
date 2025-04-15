@@ -10,7 +10,7 @@ from utils.utils import cvtColor, preprocess_input
 
 
 class DeeplabDataset(Dataset):
-    def __init__(self, annotation_lines, input_shape, num_classes, train, dataset_path):
+    def __init__(self, annotation_lines, input_shape, num_classes, train, dataset_path, depth_combine, data_augmentation):
         super(DeeplabDataset, self).__init__()
         self.annotation_lines   = annotation_lines
         self.length             = len(annotation_lines)
@@ -18,29 +18,38 @@ class DeeplabDataset(Dataset):
         self.num_classes        = num_classes
         self.train              = train
         self.dataset_path       = dataset_path
+        self.depth_combine      = depth_combine
+        self.data_augmentation  = data_augmentation
 
     def __len__(self):
         return self.length
 
     def __getitem__(self, index):
-        annotation_line = self.annotation_lines[index]
-        name            = annotation_line.split()[0]
+        annotation_line   = self.annotation_lines[index]
+        name              = annotation_line.split()[0]
+        depth_combine     = self.depth_combine
+        data_augmentation = self.data_augmentation
 
         #-------------------------------#
         #   从文件中读取图像
         #-------------------------------#
-        # jpg         = Image.open(os.path.join(os.path.join(self.dataset_path, "Images"), name + ".jpg"))
-        # png         = Image.open(os.path.join(os.path.join(self.dataset_path, "Labels"), name + ".png"))
-        rgb         = np.array(Image.open(os.path.join(os.path.join(self.dataset_path, "Images"), name + ".jpg")))
-        depth       = np.array(Image.open(os.path.join(os.path.join(self.dataset_path, "Depths"), name + ".jpg"))).reshape([1200, 1920, 1])
-        mix         = np.concatenate([rgb, depth], axis=2)
-        jpg         = Image.fromarray(mix)
-        png         = Image.open(os.path.join(os.path.join(self.dataset_path, "Labels"), name + ".png"))
+        if depth_combine:
+            rgb         = np.array(Image.open(os.path.join(os.path.join(self.dataset_path, "Images"), name + ".jpg")))
+            depth       = np.array(Image.open(os.path.join(os.path.join(self.dataset_path, "Depths"), name + ".jpg"))).reshape([1200, 1920, 1])
+            mix         = np.concatenate([rgb, depth], axis=2)
+            jpg         = Image.fromarray(mix)
+            png         = Image.open(os.path.join(os.path.join(self.dataset_path, "Labels"), name + ".png"))
+        else:
+            jpg         = Image.open(os.path.join(os.path.join(self.dataset_path, "Images"), name + ".jpg"))
+            png         = Image.open(os.path.join(os.path.join(self.dataset_path, "Labels"), name + ".png"))
         #-------------------------------#
         #   数据增强
         #-------------------------------#
-        jpg, png    = self.get_random_data(jpg, png, self.input_shape, random = self.train)
-
+        if data_augmentation:
+            jpg, png    = self.get_random_data(jpg, png, self.input_shape, random = self.train)
+        else:
+            jpg = cvtColor(jpg)
+        
         jpg         = np.transpose(preprocess_input(np.array(jpg, np.float64)), [2,0,1])
         png         = np.array(png)
         png[png >= self.num_classes] = self.num_classes
