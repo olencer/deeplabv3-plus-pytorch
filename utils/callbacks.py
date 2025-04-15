@@ -96,9 +96,17 @@ class EvalCallback():
         
         self.image_ids          = [image_id.split()[0] for image_id in image_ids]
         self.mious      = [0]
+        self.mpas       = [0]
+        self.pas        = [0]
         self.epoches    = [0]
         if self.eval_flag:
             with open(os.path.join(self.log_dir, "epoch_miou.txt"), 'a') as f:
+                f.write(str(0))
+                f.write("\n")
+            with open(os.path.join(self.log_dir, "epoch_mPA.txt"), 'a') as f:
+                f.write(str(0))
+                f.write("\n")
+            with open(os.path.join(self.log_dir, "epoch_PA.txt"), 'a') as f:
                 f.write(str(0))
                 f.write("\n")
 
@@ -178,28 +186,47 @@ class EvalCallback():
                 image.save(os.path.join(pred_dir, image_id + ".png"))
                         
             print("Calculate miou.")
-            _, IoUs, _, _ = compute_mIoU(gt_dir, pred_dir, self.image_ids, self.num_classes, None)  # 执行计算mIoU的函数
+            _, IoUs, mPA, _, PA = compute_mIoU(gt_dir, pred_dir, self.image_ids, self.num_classes, None)  # 执行计算mIoU的函数
             temp_miou = np.nanmean(IoUs) * 100
-
+            temp_mPA = np.nanmean(mPA) * 100
+            temp_PA = PA * 100
+            
             self.mious.append(temp_miou)
+            self.mpas.append(temp_mPA)
+            self.pas.append(temp_PA)
             self.epoches.append(epoch)
 
             with open(os.path.join(self.log_dir, "epoch_miou.txt"), 'a') as f:
                 f.write(str(temp_miou))
                 f.write("\n")
+
+            with open(os.path.join(self.log_dir, "epoch_mPA.txt"), 'a') as f:
+                f.write(str(temp_mPA))
+                f.write("\n")
+
+            with open(os.path.join(self.log_dir, "epoch_PA.txt"), 'a') as f:
+                f.write(str(temp_PA))
+                f.write("\n")
             
-            plt.figure()
-            plt.plot(self.epoches, self.mious, 'red', linewidth = 2, label='train miou')
-
-            plt.grid(True)
-            plt.xlabel('Epoch')
-            plt.ylabel('Miou')
-            plt.title('A Miou Curve')
-            plt.legend(loc="lower right")
-
-            plt.savefig(os.path.join(self.log_dir, "epoch_miou.png"))
-            plt.cla()
-            plt.close("all")
+            self.draw_figure(self.epoches, self.mious, self.log_dir, "mIoU")
+            self.draw_figure(self.epoches, self.mpas, self.log_dir, "mPA")
+            self.draw_figure(self.epoches, self.pas, self.log_dir, "PA")
 
             print("Get miou done.")
             shutil.rmtree(self.miou_out_path)
+
+    def draw_figure(self, x, y, path, name):
+            
+            plt.figure()
+            plt.plot(x, y, 'red', linewidth = 2, label='train ' + name)
+
+            plt.grid(True)
+            plt.xlabel('Epoch')
+            plt.ylabel(name)
+            plt.title("A " + name + " Curve")
+            plt.legend(loc="lower right")
+
+            plt.savefig(os.path.join(path, "epoch_" + name.lower() + ".png"))
+            plt.cla()
+            plt.close("all")
+            
