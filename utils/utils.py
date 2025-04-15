@@ -9,11 +9,28 @@ from PIL import Image
 #   代码仅仅支持RGB图像的预测，所有其它类型的图像都会转化成RGB
 #---------------------------------------------------------#
 def cvtColor(image):
+    # if len(np.shape(image)) == 3 and np.shape(image)[2] == 3:
+    #     return image 
+    # else:
+    #     image = image.convert('RGB')
+    #     return image 
+
     if len(np.shape(image)) == 3 and np.shape(image)[2] == 3:
         return image 
     else:
-        image = image.convert('RGB')
-        return image 
+        conv = nn.Sequential(
+            # nn.Conv2d(in_channels=4, out_channels=3, kernel_size=1, bias=False),
+            nn.Conv2d(in_channels=4, out_channels=3, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(3),
+            nn.ReLU(inplace=True)
+        ) 
+
+        a = torch.tensor(np.array(image).transpose([2, 0, 1]).astype(np.float32) / 255.0).unsqueeze(0)
+        a = conv(a).squeeze(0)
+
+        image = Image.fromarray((a.detach().numpy().transpose([1, 2, 0]) * 255.0).astype(np.uint8))
+
+        return image
 
 #---------------------------------------------------#
 #   对输入图像进行resize

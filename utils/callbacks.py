@@ -164,8 +164,13 @@ class EvalCallback():
                 #-------------------------------#
                 #   从文件中读取图像
                 #-------------------------------#
-                image_path  = os.path.join(self.dataset_path, "Images", image_id + ".jpg")
-                image       = Image.open(image_path)
+                # image_path  = os.path.join(self.dataset_path, "Images", image_id + ".jpg")
+                # image       = Image.open(image_path)
+                rgb         = np.array(Image.open(os.path.join(self.dataset_path, "Images", image_id + ".jpg")))
+                depth       = np.array(Image.open(os.path.join(self.dataset_path, "Depths", image_id + ".jpg"))).reshape([1200, 1920, 1])
+                mix         = np.concatenate([rgb, depth], axis=2)
+                image       = Image.fromarray(mix)
+            
                 #------------------------------#
                 #   获得预测txt
                 #------------------------------#

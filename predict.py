@@ -92,6 +92,7 @@ if __name__ == "__main__":
                 continue
             else:
                 r_image = deeplab.detect_image(image, count=count, name_classes=name_classes)
+                r_image = Image.blend(old_img, r_image, 0.7)
                 r_image.show()
 
     elif mode == "video":
