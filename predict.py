@@ -86,7 +86,13 @@ if __name__ == "__main__":
         while True:
             img = input('Input image filename:')
             try:
-                image = Image.open(img)
+                # image = Image.open(img)
+                old_img     = Image.open(img)
+                rgb         = np.array(old_img)
+                depth       = np.array(Image.open(img.replace('Images', 'Depths'))).reshape([1200, 1920, 1])
+                mix         = np.concatenate([rgb, depth], axis=2)
+                image       = Image.fromarray(mix)
+                
             except:
                 print('Open Error! Try again!')
                 continue
