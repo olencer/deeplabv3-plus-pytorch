@@ -34,14 +34,14 @@ class DeeplabDataset(Dataset):
         #   从文件中读取图像
         #-------------------------------#
         if depth_combine:
-            rgb         = np.array(Image.open(os.path.join(os.path.join(self.dataset_path, "Images"), name + ".jpg")))
-            depth       = np.array(Image.open(os.path.join(os.path.join(self.dataset_path, "Depths"), name + ".jpg"))).reshape([1200, 1920, 1])
+            rgb         = np.array(Image.open(os.path.join(self.dataset_path, "Images", name + ".jpg")))
+            depth       = np.array(Image.open(os.path.join(self.dataset_path, "Depths", name + ".jpg"))).reshape([1200, 1920, 1])
             mix         = np.concatenate([rgb, depth], axis=2)
             jpg         = Image.fromarray(mix)
-            png         = Image.open(os.path.join(os.path.join(self.dataset_path, "Labels"), name + ".png"))
+            png         = Image.open(os.path.join(self.dataset_path, "Labels", name + ".png"))
         else:
-            jpg         = Image.open(os.path.join(os.path.join(self.dataset_path, "Images"), name + ".jpg"))
-            png         = Image.open(os.path.join(os.path.join(self.dataset_path, "Labels"), name + ".png"))
+            jpg         = Image.open(os.path.join(self.dataset_path, "Images", name + ".jpg"))
+            png         = Image.open(os.path.join(self.dataset_path, "Labels", name + ".png"))
         #-------------------------------#
         #   数据增强
         #-------------------------------#
