@@ -29,6 +29,10 @@ if __name__ == "__main__":
     #--------------------------------------------#
     # name_classes    = ["background","aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
     name_classes    = ["_background_","buckle","tuber"]
+    #------------------------------------------------------------------#
+    #   depth_combine  结合深度信息
+    #------------------------------------------------------------------#
+    depth_combine       = False
     #-------------------------------------------------------#
     #   指向数据集所在的文件夹
     #-------------------------------------------------------#
@@ -49,13 +53,14 @@ if __name__ == "__main__":
 
         print("Get predict result.")
         for image_id in tqdm(image_ids):
-            # image_path  = os.path.join(dataset_path, "Images"+image_id+".jpg")
-            # image       = Image.open(image_path)
-         
-            rgb         = np.array(Image.open(os.path.join(dataset_path, "Images", image_id + ".jpg")))
-            depth       = np.array(Image.open(os.path.join(dataset_path, "Depths", image_id + ".jpg"))).reshape([1200, 1920, 1])
-            mix         = np.concatenate([rgb, depth], axis=2)
-            image       = Image.fromarray(mix)
+            if depth_combine:
+                rgb         = np.array(Image.open(os.path.join(dataset_path, "Images", image_id + ".jpg")))
+                depth       = np.array(Image.open(os.path.join(dataset_path, "Depths", image_id + ".jpg"))).reshape([1200, 1920, 1])
+                mix         = np.concatenate([rgb, depth], axis=2)
+                image       = Image.fromarray(mix)
+            else:
+                image_path  = os.path.join(dataset_path, "Images", image_id + ".jpg")
+                image       = Image.open(image_path)
             
             image       = deeplab.get_miou_png(image)
             image.save(os.path.join(pred_dir, image_id + ".png"))
