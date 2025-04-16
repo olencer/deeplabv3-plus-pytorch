@@ -17,8 +17,8 @@ class Data:
 
     def get_depth(self):
         depth_float = self.point_cloud.copy_data("z")
-        depth_float[np.isnan(depth_float)] = 0
         depth = ((depth_float - np.nanmin(depth_float)) / (np.nanmax(depth_float) - np.nanmin(depth_float)) * 255).astype(np.uint8)
+        depth_float[np.isnan(depth_float)] = 0
 
         return depth
     
