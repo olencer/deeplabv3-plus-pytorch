@@ -1,9 +1,16 @@
+import os
 import random
+import matplotlib
 
 import numpy as np
 import torch
 import torch.nn as nn
+import scipy.signal
+
 from PIL import Image
+from matplotlib import pyplot as plt
+
+matplotlib.use('Agg')
 
 #---------------------------------------------------------#
 #   将图像转换成RGB图像，防止灰度图在预测时报错。
@@ -107,3 +114,45 @@ def download_weights(backbone, model_dir="./model_data"):
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
     load_state_dict_from_url(url, model_dir)
+
+def loss_plot(losses, val_loss, log_dir):
+        iters = range(len(losses))
+
+        plt.figure()
+        plt.plot(iters, losses, 'red', linewidth = 2, label='train loss')
+        plt.plot(iters, val_loss, 'coral', linewidth = 2, label='val loss')
+        try:
+            if len(losses) < 25:
+                num = 5
+            else:
+                num = 15
+            
+            plt.plot(iters, scipy.signal.savgol_filter(losses, num, 3), 'green', linestyle = '--', linewidth = 2, label='smooth train loss')
+            plt.plot(iters, scipy.signal.savgol_filter(val_loss, num, 3), '#8B4513', linestyle = '--', linewidth = 2, label='smooth val loss')
+        except:
+            pass
+
+        plt.grid(True)
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.legend(loc="upper right")
+
+        plt.savefig(os.path.join(log_dir, "epoch_loss.png"))
+
+        plt.cla()
+        plt.close("all")
+
+def draw_figure(x, y, path, name):
+            
+    plt.figure()
+    plt.plot(x, y, 'red', linewidth = 2, label='train ' + name)
+
+    plt.grid(True)
+    plt.xlabel('Epoch')
+    plt.ylabel(name)
+    plt.title("A " + name + " Curve")
+    plt.legend(loc="lower right")
+
+    plt.savefig(os.path.join(path, "epoch_" + name.lower() + ".png"))
+    plt.cla()
+    plt.close("all")

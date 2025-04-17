@@ -1,12 +1,7 @@
 import os
 
-import matplotlib
 import torch
 import torch.nn.functional as F
-
-matplotlib.use('Agg')
-from matplotlib import pyplot as plt
-import scipy.signal
 
 import cv2
 import shutil
@@ -15,7 +10,7 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
-from .utils import cvtColor, preprocess_input, resize_image
+from .utils import cvtColor, preprocess_input, resize_image, loss_plot, draw_figure
 from .utils_metrics import compute_mIoU
 
 
@@ -49,34 +44,7 @@ class LossHistory():
 
         self.writer.add_scalar('loss', loss, epoch)
         self.writer.add_scalar('val_loss', val_loss, epoch)
-        self.loss_plot()
-
-    def loss_plot(self):
-        iters = range(len(self.losses))
-
-        plt.figure()
-        plt.plot(iters, self.losses, 'red', linewidth = 2, label='train loss')
-        plt.plot(iters, self.val_loss, 'coral', linewidth = 2, label='val loss')
-        try:
-            if len(self.losses) < 25:
-                num = 5
-            else:
-                num = 15
-            
-            plt.plot(iters, scipy.signal.savgol_filter(self.losses, num, 3), 'green', linestyle = '--', linewidth = 2, label='smooth train loss')
-            plt.plot(iters, scipy.signal.savgol_filter(self.val_loss, num, 3), '#8B4513', linestyle = '--', linewidth = 2, label='smooth val loss')
-        except:
-            pass
-
-        plt.grid(True)
-        plt.xlabel('Epoch')
-        plt.ylabel('Loss')
-        plt.legend(loc="upper right")
-
-        plt.savefig(os.path.join(self.log_dir, "epoch_loss.png"))
-
-        plt.cla()
-        plt.close("all")
+        loss_plot(self.losses, self.val_loss, self.log_dir)
 
 class EvalCallback():
     def __init__(self, net, input_shape, num_classes, image_ids, dataset_path, log_dir, cuda, \
@@ -208,25 +176,10 @@ class EvalCallback():
                 f.write(str(temp_PA))
                 f.write("\n")
             
-            self.draw_figure(self.epoches, self.mious, self.log_dir, "mIoU")
-            self.draw_figure(self.epoches, self.mpas, self.log_dir, "mPA")
-            self.draw_figure(self.epoches, self.pas, self.log_dir, "PA")
+            draw_figure(self.epoches, self.mious, self.log_dir, "mIoU")
+            draw_figure(self.epoches, self.mpas, self.log_dir, "mPA")
+            draw_figure(self.epoches, self.pas, self.log_dir, "PA")
 
             print("Get miou done.")
             shutil.rmtree(self.miou_out_path)
-
-    def draw_figure(self, x, y, path, name):
-            
-            plt.figure()
-            plt.plot(x, y, 'red', linewidth = 2, label='train ' + name)
-
-            plt.grid(True)
-            plt.xlabel('Epoch')
-            plt.ylabel(name)
-            plt.title("A " + name + " Curve")
-            plt.legend(loc="lower right")
-
-            plt.savefig(os.path.join(path, "epoch_" + name.lower() + ".png"))
-            plt.cla()
-            plt.close("all")
-            
+      
