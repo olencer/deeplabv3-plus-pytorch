@@ -8,12 +8,12 @@ from torchsummary import summary
 from nets.deeplabv3_plus import DeepLab
 
 if __name__ == "__main__":
-    input_shape     = [512, 512]
-    num_classes     = 21
+    input_shape     = [1200, 1920]
+    num_classes     = 3
     backbone        = 'mobilenet'
     
     device  = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model   = DeepLab(num_classes=num_classes, backbone=backbone, downsample_factor=16, pretrained=False).to(device)
+    model   = DeepLab(num_classes=num_classes, backbone=backbone, downsample_factor=8, pretrained=False).to(device)
     summary(model, (3, input_shape[0], input_shape[1]))
     
     dummy_input     = torch.randn(1, 3, input_shape[0], input_shape[1]).to(device)
